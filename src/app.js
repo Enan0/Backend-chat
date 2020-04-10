@@ -28,6 +28,7 @@ app.set('port',process.env.PORT || 4000);
 
 //Routes
 app.use('/api/users',require('./routes/users_r'));
+app.use('/api/mensajes',require('./routes/mensajes_r'));
 
 
 module.exports = app;

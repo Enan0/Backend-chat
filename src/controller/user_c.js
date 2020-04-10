@@ -57,36 +57,12 @@ userController.startSession = async(req,res)=>{
 
 userController.endSession = async(req,res)=>{
     //Termina la sesion
-    await req.session.destroy();
-}
-
-userController.enviarMensaje = async(req,res)=>{
-    if(req.session.logged){
-        //1 Crear mensaje
-        var {texto} = req.body;
-        const emisor = await userModel.findById(req.session.userId);
-        const receptor = await userModel.findById(req.params.receptor);
-        const mensaje = new mensajeModel({
-            emisor:emisor.email,
-            receptor:receptor.email,
-            mensaje:texto
-        });
-        //2 Lo guarda en la base de datos
-        await mensaje.save();
-        res.json({status:"Mensaje enviado"});
+    try {
+        await req.session.destroy();
+        res.json({status:"Session terminada"})
+    } catch (error) {
+        
     }
 }
 
-userController.verMensajes = async(req,res)=>{
-    //Muestra los mensajes
-    if(req.session.logged){
-        //1 Obtiene el receptor y emisor
-        const emisor = await userModel.findById(req.session.userId);
-        const receptor = await userModel.findById(req.params.receptor);
-        //2 Busca mensajes
-        const mensajes = await mensajeModel.find({emisor:emisor.email,receptor:receptor.email});
-        //3 Los muestra en pantalla
-        res.json(mensajes);
-    }
-}
 module.exports = userController;

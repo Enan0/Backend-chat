@@ -10,8 +10,5 @@ router.route('/')
 router.route('/create').post(createUser);
 router.route('/login').post(startSession);
 router.route('/logOut').post(endSession);
-router.route('/chat/:receptor')
-    .get(verMensajes)
-    .post(enviarMensaje);
 
 module.exports = router;
