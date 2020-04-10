@@ -1,4 +1,5 @@
 const userModel = require("../model/users_m");
+const mensajeModel = require('../model/mensajes_m');
 const userController = {};
 const bcrypt = require("bcrypt");
 const saltRounds = 13;
@@ -16,11 +17,14 @@ userController.createUser = async(req,res)=>{
     //Pedimos los datos
     var {email,username,password} = req.body;
     password = bcrypt.hashSync(password,salt);
+
     const user = new userModel({
         email,
         username,
-        password
+        password,
+        salt: "test"
     });
+    
     await user.save()
     .then(()=>{
         res.json({succes:"User created"});
@@ -56,4 +60,31 @@ userController.endSession = async(req,res)=>{
     await req.session.destroy();
 }
 
+userController.enviarMensaje = async(req,res)=>{
+    if(req.session.logged){
+        const receptor = await userModel.findById(req.session.userId);
+        const emisor = await userModel.findOne({email:"receptor@gmail.com"});
+        const nuevoMensaje = new mensajeModel({
+            emisor: emisor.email,
+            receptor:receptor.email,
+            mensaje:"hola!"
+        });
+        await nuevoMensaje.save();
+    }
+}
+
+userController.verMensajes = async(req,res)=>{
+    //Muestra los mensajes
+    if(req.session.logged){
+        //Obtiene el usuario
+        const user = await userModel.findById(req.session.userId);
+        //Pide los mensajes
+        const mensajesEnviados = await mensajeModel.find({emisor:user.email});
+        const mensajesRecibidos = await mensajeModel.find({receptor:user.email});
+        
+        //Los muestra
+        const mensajes = mensajesEnviados.concat(mensajesRecibidos);
+        res.json(mensajes);
+    }
+}
 module.exports = userController;

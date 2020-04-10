@@ -14,6 +14,10 @@ const userSchema = new Schema({
         type:String,
         required:true
     },
+    listaDeAmigos:{
+        type:String
+    }
+    ,
     salt:{
         type:String,
         required:true,
