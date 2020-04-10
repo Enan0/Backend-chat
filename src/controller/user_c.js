@@ -62,28 +62,30 @@ userController.endSession = async(req,res)=>{
 
 userController.enviarMensaje = async(req,res)=>{
     if(req.session.logged){
-        const receptor = await userModel.findById(req.session.userId);
-        const emisor = await userModel.findOne({email:"receptor@gmail.com"});
-        const nuevoMensaje = new mensajeModel({
-            emisor: emisor.email,
+        //1 Crear mensaje
+        var {texto} = req.body;
+        const emisor = await userModel.findById(req.session.userId);
+        const receptor = await userModel.findById(req.params.receptor);
+        const mensaje = new mensajeModel({
+            emisor:emisor.email,
             receptor:receptor.email,
-            mensaje:"hola!"
+            mensaje:texto
         });
-        await nuevoMensaje.save();
+        //2 Lo guarda en la base de datos
+        await mensaje.save();
+        res.json({status:"Mensaje enviado"});
     }
 }
 
 userController.verMensajes = async(req,res)=>{
     //Muestra los mensajes
     if(req.session.logged){
-        //Obtiene el usuario
-        const user = await userModel.findById(req.session.userId);
-        //Pide los mensajes
-        const mensajesEnviados = await mensajeModel.find({emisor:user.email});
-        const mensajesRecibidos = await mensajeModel.find({receptor:user.email});
-        
-        //Los muestra
-        const mensajes = mensajesEnviados.concat(mensajesRecibidos);
+        //1 Obtiene el receptor y emisor
+        const emisor = await userModel.findById(req.session.userId);
+        const receptor = await userModel.findById(req.params.receptor);
+        //2 Busca mensajes
+        const mensajes = await mensajeModel.find({emisor:emisor.email,receptor:receptor.email});
+        //3 Los muestra en pantalla
         res.json(mensajes);
     }
 }
