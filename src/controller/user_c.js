@@ -1,5 +1,4 @@
 const userModel = require("../model/users_m");
-const mensajeModel = require('../model/mensajes_m');
 const userController = {};
 const bcrypt = require("bcrypt");
 const saltRounds = 13;
@@ -17,14 +16,14 @@ userController.createUser = async(req,res)=>{
     //Pedimos los datos
     var {email,username,password} = req.body;
     password = bcrypt.hashSync(password,salt);
-
+    //Creamos el usuario
     const user = new userModel({
         email,
         username,
         password,
-        salt: "test"
+        salt: "dev"
     });
-    
+    //Lo guardamos
     await user.save()
     .then(()=>{
         res.json({succes:"User created"});
@@ -54,14 +53,13 @@ userController.startSession = async(req,res)=>{
     }   
 }
 
-
 userController.endSession = async(req,res)=>{
     //Termina la sesion
     try {
         await req.session.destroy();
         res.json({status:"Session terminada"})
     } catch (error) {
-        
+        throw error;
     }
 }
 
