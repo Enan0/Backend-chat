@@ -47,8 +47,13 @@ userController.startSession = async(req,res)=>{
         }else{
             res.json({succes:"SESSION DONT START"});
         }
-    }
-    
+    }   
+}
+
+
+userController.endSession = async(req,res)=>{
+    //Termina la sesion
+    await req.session.destroy();
 }
 
 module.exports = userController;
