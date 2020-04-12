@@ -1,7 +1,7 @@
 const {Router} = require('express');
 const router = Router();
 
-const {viewAllUsers,createUser,startSession,endSession,enviarMensaje,verMensajes} = require('../controller/user_c');
+const {viewAllUsers,createUser,startSession,endSession,verifiqueSession} = require('../controller/user_c');
 
 //DEV TOOL
 router.route('/')
@@ -13,5 +13,7 @@ router.route('/singup').post(createUser);
 router.route('/login').post(startSession);
 //Cerrar sesion
 router.route('/logOut').post(endSession);
+
+router.route('/verifique').get(verifiqueSession)
 
 module.exports = router;

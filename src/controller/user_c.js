@@ -46,8 +46,8 @@ userController.startSession = async(req,res)=>{
         if(matchPassword){
             req.session.logged = true,
             req.session.userId = user._id
-            console.log(req.session.userId);
-            res.json({succes:"SESSION START"});
+            res.cookie("userId",user._id);
+            res.json({status:"Session start"});
         }else{
             res.json({succes:"SESSION DONT START"});
         }
@@ -60,31 +60,8 @@ userController.endSession = async(req,res)=>{
     await req.session.destroy();
 }
 
-userController.enviarMensaje = async(req,res)=>{
-    if(req.session.logged){
-        const receptor = await userModel.findById(req.session.userId);
-        const emisor = await userModel.findOne({email:"receptor@gmail.com"});
-        const nuevoMensaje = new mensajeModel({
-            emisor: emisor.email,
-            receptor:receptor.email,
-            mensaje:"hola!"
-        });
-        await nuevoMensaje.save();
-    }
+userController.verifiqueSession = async(req,res)=>{
+    res.send(req.cookies)
 }
 
-userController.verMensajes = async(req,res)=>{
-    //Muestra los mensajes
-    if(req.session.logged){
-        //Obtiene el usuario
-        const user = await userModel.findById(req.session.userId);
-        //Pide los mensajes
-        const mensajesEnviados = await mensajeModel.find({emisor:user.email});
-        const mensajesRecibidos = await mensajeModel.find({receptor:user.email});
-        
-        //Los muestra
-        const mensajes = mensajesEnviados.concat(mensajesRecibidos);
-        res.json(mensajes);
-    }
-}
 module.exports = userController;

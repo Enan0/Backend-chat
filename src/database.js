@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const URI = process.env.dbUri || 'mongodb://localhost/chatApp';
+const URI = 'mongodb://localhost/chatApp';
 const connectDb = async()=>{
     return mongoose.connect(URI,{ useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
     .then(db=>{
@@ -13,3 +13,5 @@ connectDb()
     console.log(`Error to connect db '${err.message}'`);
     connectDb();
 })
+
+module.exports =mongoose.connection;

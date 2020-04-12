@@ -11,19 +11,23 @@ mensajeController.enviarMensaje = async (req,res)=>{
             const idEmisor = req.session.userId;
             const idReceptor = req.params.receptor;
         //Obtengo el email del emisor y receptor    
-        const emisor = await userModel.findById(idEmisor);
-        const receptor = await userModel.findById(idReceptor);
+        const emisor = await userModel.findById(idEmisor) || false;
+        const receptor = await userModel.findById(idReceptor) || false;
         //2 Crear mensaje
         const {texto} = req.body;
-        const mensaje = new mensajeModel({
-            emisor:emisor.email,
-            receptor:receptor.email,
-            mensaje:texto
-        });
-        //3 Subir mensaje
-        await mensaje.save()
-        .then(res.json({status:"Mensaje enviado"}))
-        // .catch(res.json({status:"Error al enviar mensaje"}));
+        if(emisor && receptor){
+            const mensaje = new mensajeModel({
+                emisor:emisor._id,
+                receptor:receptor._id,
+                mensaje:texto
+            });
+            //3 Subir mensaje
+            await mensaje.save()
+            .then(res.json({status:"Mensaje enviado"}))
+            // .catch(res.json({status:"Error al enviar mensaje"}));
+        }else{
+            res.json({status:"Imposible enviar el mensaje"});
+        }
     }else{
         res.json({status:"Necesitas estar logeado"});
     }
@@ -40,8 +44,8 @@ mensajeController.verMensajes = async(req,res)=>{
         const emisor = await userModel.findById(idEmisor);
         const receptor = await userModel.findById(idReceptor);
         //2 Buscamos los mensajes y los guardamos
-        const mensajesEnviados = await mensajeModel.find({emisor:emisor.email,receptor:receptor.email});
-        const mensajesRecibidos = await mensajeModel.find({receptor:emisor.email,emisor:receptor.email});
+        const mensajesEnviados = await mensajeModel.find({emisor:emisor._id,receptor:receptor._id});
+        const mensajesRecibidos = await mensajeModel.find({receptor:emisor._id,emisor:receptor._id});
         //3Mostramos los mensajes
         const mensajes = mensajesEnviados.concat(mensajesRecibidos);
         res.send(mensajes);
@@ -49,6 +53,7 @@ mensajeController.verMensajes = async(req,res)=>{
         res.json({status:"Necesitas estar logeado"});
     }
 }
+
 
 
 module.exports = mensajeController;
